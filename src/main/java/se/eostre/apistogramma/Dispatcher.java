@@ -22,6 +22,9 @@
 package se.eostre.apistogramma;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,23 +37,34 @@ public class Dispatcher extends HttpServlet {
 	private static final long serialVersionUID = 1337L;
 	
 	private List<Controller> controllers;
-	
 	private List<Route> routes;
-	
 	private Map<String, Controller> routing;
 	
+	public Dispatcher() {
+		controllers = new LinkedList<Controller>();
+		routes = new LinkedList<Route>();
+		routing = new HashMap<String, Controller>();		
+	}
 	
-	void setControllers(List<Controller> controllers) {
+	public void setControllers(List<Controller> controllers) {
 		this.controllers = controllers;
 	}
 	
-	void setRoutes(List<Route> routes) {
+	public void setRoutes(List<Route> routes) {
 		this.routes = routes;
 	}
 	
 	public void init() {
 		for (Controller controller : controllers) {
-			routing.put(controller.name(), controller);
+			routing.put(controller.name(), controller);				
+			for (Method method : controller.getClass().getMethods()) {
+				Action action = method.getAnnotation(Action.class);
+				if (action != null) {
+					Route route = new Route(action.route());
+					route.setController(controller);
+					routes.add(route);
+				}
+			}
 		}
 	}
 	
