@@ -21,7 +21,13 @@
  */
 package se.eostre.apistogramma;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Controller {
+	
+	private Map<String, Method> actions = new HashMap<String, Method>();
 	
 	protected String name() {
 		return getClass().getName().toLowerCase();
@@ -32,7 +38,21 @@ public abstract class Controller {
 	}
 	
 	protected final void reflect(Environment environment) {
-		// TODO: execute action method
+		String action = environment.action();
+		Method method = actions.get(action);
+		if (method == null) {
+			try {
+				method = getClass().getMethod(action, Environment.class);
+			} catch (Exception e) {
+				throw new RuntimeException("No such action! " + name() + "/" + action, e);
+			}
+			actions.put(action, method);
+		}
+		try {
+			method.invoke(this, environment);
+		} catch (Exception e) {
+			throw new RuntimeException("Invocation misfired! " + name() + "/" + action, e);
+		}
 	}
 
 }
