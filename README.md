@@ -16,10 +16,10 @@ This is the intended conceptual usage:
             environment.render("index");
         }
         
-        @Action(route="/:controller/:id/:action")
+        @Action(route="/:controller/:id")
         public void view(Environment environment) {
             environment.setModel("user", User.find(environment.getAttribute("id")));
-            environment.render();
+            environment.render("view");
         }
         
         @Action(route="/:controller/:id/:action")
