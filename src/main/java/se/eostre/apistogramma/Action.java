@@ -25,4 +25,6 @@ public @interface Action {
 	
 	public String route();
 
+	public String method() default "";
+
 }

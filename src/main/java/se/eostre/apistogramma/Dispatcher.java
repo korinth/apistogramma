@@ -23,10 +23,10 @@ package se.eostre.apistogramma;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,29 +38,22 @@ public class Dispatcher extends HttpServlet {
 	
 	private List<Controller> controllers;
 	private List<Route> routes;
-	private Map<String, Controller> routing;
 	
 	public Dispatcher() {
 		controllers = new LinkedList<Controller>();
-		routes = new LinkedList<Route>();
-		routing = new HashMap<String, Controller>();		
+		routes = new LinkedList<Route>();	
 	}
 	
 	public void setControllers(List<Controller> controllers) {
 		this.controllers = controllers;
 	}
 	
-	public void setRoutes(List<Route> routes) {
-		this.routes = routes;
-	}
-	
 	public void init() {
-		for (Controller controller : controllers) {
-			routing.put(controller.name(), controller);				
+		for (Controller controller : controllers) {			
 			for (Method method : controller.getClass().getMethods()) {
 				Action action = method.getAnnotation(Action.class);
 				if (action != null) {
-					Route route = new Route(action.route());
+					Route route = new Route(action.route(), action.method());
 					route.setController(controller);
 					routes.add(route);
 				}
@@ -69,29 +62,39 @@ public class Dispatcher extends HttpServlet {
 	}
 	
 	protected void service(HttpServletRequest request, HttpServletResponse response) {
+		Environment environment = new Environment(request, response);
 		try {
-			Environment environment = new Environment(request, response);
-			for (Route route : routes) {
-				if (environment.resolve(route)) {
-					dispatch(environment, route.controller);
-					break;
-				}
-			}			
-		} catch (Exception exception) {
+			dispatch(environment);
+		} catch (Status status) {
 			try {
-				response.sendError(500, "Failed to dispatch request!");
+				handle(status, environment);
+			} catch (IOException exception) {
 				exception.printStackTrace();
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
+			}
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	private void dispatch(Environment environment) throws Status {
+		for (Route route : routes) {
+			if (environment.resolve(route)) {
+				route.controller.control(environment);
+				return;
 			}
 		}
 	}
 	
-	private void dispatch(Environment environment, Controller controller) {
-		if (controller == null) {
-			controller = routing.get(environment.controller());
-		}			
-		controller.control(environment);
+	private void handle(Status status, Environment environment) throws IOException {
+		environment.setModel("status", status);
+		switch (status.code) {
+		case 200:
+			environment.render();
+			break;
+		default:
+			environment.getResponse().sendError(status.code, status.getMessage()); // TODO: use a configured status controller!
+			break;
+		}
 	}
 
 }

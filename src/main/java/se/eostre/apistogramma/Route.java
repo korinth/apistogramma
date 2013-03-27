@@ -27,14 +27,23 @@ import java.util.regex.Pattern;
 
 public class Route {
 	
+	String route;
+	String method;
+	
 	Controller controller;
 	
 	private Pattern pattern;
 	private String[] parts;
 	
-	public Route(String uri) {
-		pattern = Pattern.compile(uri.replaceAll(":[^/]*", "[^/]*"));
-		parts = uri.split("/");
+	public Route(String route) {
+		this(route, "");
+	}
+	
+	public Route(String route, String method) {
+		this.route = route;
+		this.method = method.toLowerCase();
+		this.pattern = Pattern.compile(route.replaceAll(":[^/]*", "[^/]*"));
+		parts = route.split("/");
 	}
 	
 	public void setController(Controller controller) {

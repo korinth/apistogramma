@@ -21,6 +21,7 @@
  */
 package se.eostre.apistogramma;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,26 +34,35 @@ public abstract class Controller {
 		return getClass().getName().toLowerCase();
 	}
 
-	protected void control(Environment environment) {
+	protected void control(Environment environment) throws Status {
 		reflect(environment);
 	}
 	
-	protected final void reflect(Environment environment) {
-		String action = environment.action();
+	protected final void reflect(Environment environment) throws Status {
+		try {
+			String action = environment.action();
+			Method method = cache(action);
+			method.invoke(this, environment);
+		} catch (NoSuchMethodException exception) {
+			throw new Status("No such action!", 404, exception);
+		} catch (InvocationTargetException exception) {
+			if (exception.getCause() instanceof Status) {
+				throw (Status) exception.getCause();
+			} else {
+				throw new Status("Unhandled exception!", 500, exception.getCause());
+			}			
+		} catch (Exception exception) {
+			throw new Status("Internal server error!", 500, exception);
+		}
+	}
+	
+	private Method cache(String action) throws SecurityException, NoSuchMethodException {
 		Method method = actions.get(action);
 		if (method == null) {
-			try {
-				method = getClass().getMethod(action, Environment.class);
-			} catch (Exception e) {
-				throw new RuntimeException("No such action! " + name() + "/" + action, e);
-			}
+			method = getClass().getMethod(action, Environment.class);
 			actions.put(action, method);
 		}
-		try {
-			method.invoke(this, environment);
-		} catch (Exception e) {
-			throw new RuntimeException("Invocation misfired! " + name() + "/" + action, e);
-		}
+		return method;
 	}
 
 }

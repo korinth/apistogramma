@@ -21,6 +21,7 @@
  */
 package se.eostre.apistogramma;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,9 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class Environment {
 	
-	static final String FILE_SUFFIX = "(\\.[a-zA-Z0-9]{3,})?$";
-	
+	String route;
 	String uri;
+	String method;
 	HttpServletRequest request;
 	HttpServletResponse response;
 	Map<String, String> attributes;
@@ -38,11 +39,15 @@ public class Environment {
 	Environment(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
 		this.response = response;
-		uri = request.getPathInfo().replaceAll("FILE_SUFFIX", "");
+		uri = request.getPathInfo();
+		method = request.getMethod().toLowerCase();
 	}
 	
 	boolean resolve(Route route) {
-		attributes = route.parse(uri);
+		if (route.method.isEmpty() || route.method.equals(method)) {
+			attributes = route.parse(uri);		
+			this.route = route.route;
+		}
 		return attributes != null;
 	}
 	
@@ -70,8 +75,16 @@ public class Environment {
 		request.setAttribute(name, object);
 	}
 	
+	public String getRoute() {
+		return route;
+	}
+	
 	public String getUri() {
 		return uri;
+	}
+	
+	public String getMethod() {
+		return method;
 	}
 
 	public HttpServletRequest getRequest() {
@@ -95,6 +108,16 @@ public class Environment {
 		request.getRequestDispatcher("/" + controller + "/" + action + ".jsp");
 	}
 	
-	// TODO: redirect(String action) or redirect(String controller, String action) ?
+	public void redirect(String path) throws IOException {
+		// TODO: if path.startsWith("/") add context path
+		response.sendRedirect(path);
+	}
+	
+	@Override
+	public String toString() {
+		return "{ route =>" + route + ", uri =>" + uri + ", method =>" + method + ", attributes =>" + attributes + "}";
+	}
+	
+	
 	
 }
