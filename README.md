@@ -37,7 +37,7 @@ This is the intended conceptual usage:
         }
         
         @Action(route="/custom/path/with/neither/controller/nor/action")
-        public void (Environment environment) {
+        public void custom(Environment environment) {
             environment.render("users", "custom");
         }
         
