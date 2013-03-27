@@ -60,5 +60,9 @@ public class Route {
 		return attributes;
 	}
 	
+	boolean isMatch(String controller, String action) {
+		return (controller == null || controller.equals(this.controller)) && (action == null || action.equals(this.action));
+	}
+	
 
 }

@@ -21,15 +21,12 @@
  */
 package se.eostre.apistogramma;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
-//import java.util.HashMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-//import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -80,7 +77,7 @@ public class Dispatcher extends HttpServlet {
 		} catch (Status status) {
 			try {
 				handle(status, environment);
-			} catch (IOException exception) {
+			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
 		} catch (Exception exception) {
@@ -98,7 +95,7 @@ public class Dispatcher extends HttpServlet {
 		}
 	}
 	
-	private void handle(Status status, Environment environment) throws IOException {
+	private void handle(Status status, Environment environment) throws Exception {
 		status.printStackTrace(); // XXX: remove
 		environment.setModel("status", status);
 		switch (status.code) {

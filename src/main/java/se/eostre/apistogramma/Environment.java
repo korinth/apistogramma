@@ -21,7 +21,6 @@
  */
 package se.eostre.apistogramma;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,9 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public class Environment {
 	
-	String route;
 	String uri;
 	String method;
+	String route;
+	String controller;
+	String action;
 	HttpServletRequest request;
 	HttpServletResponse response;
 	Map<String, String> attributes;
@@ -46,18 +47,17 @@ public class Environment {
 	boolean resolve(Route route) {
 		if (route.method.isEmpty() || route.method.equals(method)) {
 			attributes = route.parse(uri);
-			System.out.println(attributes);
-			this.route = route.route;
+			if (attributes != null) {
+				if (route.isMatch(attributes.get("controller"), attributes.get("action"))) {
+					this.route = route.route;				
+					controller = route.controller;				
+					action = route.action;				
+				} else {
+					attributes = null;
+				}				
+			}
 		}
 		return attributes != null;
-	}
-	
-	String controller() {
-		return attributes.get("controller");
-	}
-	
-	String action() {
-		return attributes.get("action");
 	}
 	
 	public String getAttribute(String name) {
@@ -96,22 +96,30 @@ public class Environment {
 		return response;
 	}
 	
-	public void render() {
-		render(controller(), action());
+	public void render() throws Status {
+		render(controller, action);
 	}
 	
-	public void render(String action) {
-		render(controller(), action);
+	public void render(String action) throws Status {
+		render(controller, action);
 	}
 	
-	public void render(String controller, String action) {
+	public void render(String controller, String action) throws Status {
 		// TODO: if not AJAX
-		request.getRequestDispatcher("/" + controller + "/" + action + ".jsp");
+		try {
+			request.getRequestDispatcher("/" + controller + "/" + action + ".jsp").forward(request, response);
+		} catch (Exception exception) {
+			throw new Status("Unable to render!", 500, exception);
+		}
 	}
 	
-	public void redirect(String path) throws IOException {
+	public void redirect(String path) throws Status {
 		// TODO: if path.startsWith("/") add context path
-		response.sendRedirect(path);
+		try {
+			response.sendRedirect(path);
+		} catch (Exception exception) {
+			throw new Status("Unable to redirect!", 500, exception);
+		}
 	}
 	
 	@Override

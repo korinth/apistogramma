@@ -40,8 +40,7 @@ public abstract class Controller {
 	
 	protected final void reflect(Environment environment) throws Status {
 		try {
-			String action = environment.action();
-			Method method = cache(action);
+			Method method = cache(environment.action);
 			method.invoke(this, environment);
 		} catch (NoSuchMethodException exception) {
 			throw new Status("No such action!", 404, exception);
@@ -59,7 +58,6 @@ public abstract class Controller {
 	private Method cache(String action) throws SecurityException, NoSuchMethodException {
 		Method method = actions.get(action);
 		if (method == null) {
-			System.out.println(action);
 			method = getClass().getMethod(action, Environment.class);
 			actions.put(action, method);
 		}
