@@ -24,8 +24,11 @@ package se.eostre.apistogramma;
 import java.io.IOException;
 import java.lang.reflect.Method;
 //import java.util.HashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 //import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
@@ -36,25 +39,34 @@ public class Dispatcher extends HttpServlet {
 	
 	private static final long serialVersionUID = 1337L;
 	
-	private List<Controller> controllers;
+	private Map<String, Controller> controllers;
 	private List<Route> routes;
 	
 	public Dispatcher() {
-		controllers = new LinkedList<Controller>();
+		controllers = new HashMap<String, Controller>();
 		routes = new LinkedList<Route>();	
 	}
 	
 	public void setControllers(List<Controller> controllers) {
-		this.controllers = controllers;
+		for (Controller controller : controllers) {
+			this.controllers.put(controller.name(), controller);
+		}
+	}
+	
+	public void add(Controller... controllers) {
+		for (Controller controller : controllers) {
+			this.controllers.put(controller.name(), controller);;			
+		}
 	}
 	
 	public void init() {
-		for (Controller controller : controllers) {			
-			for (Method method : controller.getClass().getMethods()) {
+		for (Entry<String, Controller> entry : controllers.entrySet()) {	
+			for (Method method : entry.getValue().getClass().getMethods()) {
 				Action action = method.getAnnotation(Action.class);
 				if (action != null) {
 					Route route = new Route(action.route(), action.method());
-					route.setController(controller);
+					route.controller = entry.getKey();
+					route.action = method.getName();
 					routes.add(route);
 				}
 			}
@@ -79,13 +91,15 @@ public class Dispatcher extends HttpServlet {
 	private void dispatch(Environment environment) throws Status {
 		for (Route route : routes) {
 			if (environment.resolve(route)) {
-				route.controller.control(environment);
+				Controller controller = controllers.get(route.controller);
+				controller.control(environment);
 				return;
 			}
 		}
 	}
 	
 	private void handle(Status status, Environment environment) throws IOException {
+		status.printStackTrace(); // XXX: remove
 		environment.setModel("status", status);
 		switch (status.code) {
 		case 200:

@@ -29,8 +29,8 @@ public class Route {
 	
 	String route;
 	String method;
-	
-	Controller controller;
+	String controller;
+	String action;
 	
 	private Pattern pattern;
 	private String[] parts;
@@ -44,10 +44,6 @@ public class Route {
 		this.method = method.toLowerCase();
 		this.pattern = Pattern.compile(route.replaceAll(":[^/]*", "[^/]*"));
 		parts = route.split("/");
-	}
-	
-	public void setController(Controller controller) {
-		this.controller = controller;
 	}
 	
 	Map<String, String> parse(String uri) {

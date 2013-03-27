@@ -45,7 +45,8 @@ public class Environment {
 	
 	boolean resolve(Route route) {
 		if (route.method.isEmpty() || route.method.equals(method)) {
-			attributes = route.parse(uri);		
+			attributes = route.parse(uri);
+			System.out.println(attributes);
 			this.route = route.route;
 		}
 		return attributes != null;

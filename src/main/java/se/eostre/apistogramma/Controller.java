@@ -31,7 +31,7 @@ public abstract class Controller {
 	private Map<String, Method> actions = new HashMap<String, Method>();
 	
 	protected String name() {
-		return getClass().getName().toLowerCase();
+		return getClass().getSimpleName().toLowerCase();
 	}
 
 	protected void control(Environment environment) throws Status {
@@ -59,6 +59,7 @@ public abstract class Controller {
 	private Method cache(String action) throws SecurityException, NoSuchMethodException {
 		Method method = actions.get(action);
 		if (method == null) {
+			System.out.println(action);
 			method = getClass().getMethod(action, Environment.class);
 			actions.put(action, method);
 		}

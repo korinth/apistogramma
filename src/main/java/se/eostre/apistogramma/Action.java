@@ -21,6 +21,10 @@
  */
 package se.eostre.apistogramma;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Action {
 	
 	public String route();
