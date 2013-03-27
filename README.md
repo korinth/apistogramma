@@ -2,6 +2,8 @@
 
 Apistogramma is a lightweight Java MVC-replacement. It is targeted for those projects where you could just as easily use plain servlets and JSP, but want a minimal abstraction of controllers, models and views.
 
+This project is work in progress. Suggestions are welcome!
+
 ## Intention
 
 This is the intended conceptual usage:
