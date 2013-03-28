@@ -85,3 +85,14 @@ The following is an example of the intensions for usage of Apistogramma.
         </servlet-mapping>
     
     </web-app>
+
+## Timeline
+For now it is possible to use Apistogramma for basic action routing using `:controller` and `:action` as binding wildcards. Controller class and action methods names are used in downcase to route. It is also possible to bind HTTP method to routes.
+
+In the near future AJAX requests need to be supported by helpers in `Environment.java`. Probably with included JSON rendering.
+
+A long term goal is to add model abstraction in order to separate models and records in any given data access setup (I recommend using [jORM][1] as simplistic ORM).
+
+Following a possible model abstraction it would be nice to provide `<form>` tag helpers as a tag-lib, and corresponding mapping of models in `Environment.java`.
+
+[1]: https://github.com/jajja/jorm
