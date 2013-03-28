@@ -26,43 +26,42 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Route {
-	
-	String route;
-	String method;
-	String controller;
-	String action;
-	
-	private Pattern pattern;
-	private String[] parts;
-	
-	public Route(String route) {
-		this(route, "");
-	}
-	
-	public Route(String route, String method) {
-		this.route = route;
-		this.method = method.toLowerCase();
-		this.pattern = Pattern.compile(route.replaceAll(":[^/]*", "[^/]*"));
-		parts = route.split("/");
-	}
-	
-	Map<String, String> parse(String uri) {
-		Map<String, String> attributes = null;
-		String[] params = uri.split("/");
-		if (pattern.matcher(uri).matches() && parts.length == params.length) {
-			attributes = new HashMap<String, String>();
-			for (int i = 0; i < parts.length; i++) {
-				if (parts[i].startsWith(":")) {
-					attributes.put(parts[i].replaceFirst(":", ""), params[i]);
-				}
-			}
-		}
-		return attributes;
-	}
-	
-	boolean isMatch(String controller, String action) {
-		return (controller == null || controller.equals(this.controller)) && (action == null || action.equals(this.action));
-	}
-	
+    
+    String route;
+    String method;
+    String controller;
+    String action;
+    
+    private Pattern pattern;
+    private String[] parts;
+    
+    public Route(String route) {
+        this(route, "");
+    }
+    
+    public Route(String route, String method) {
+        this.route = route;
+        this.method = method.toLowerCase();
+        this.pattern = Pattern.compile(route.replaceAll(":[^/]*", "[^/]*"));
+        parts = route.split("/");
+    }
+    
+    Map<String, String> parse(String uri) {
+        Map<String, String> attributes = null;
+        String[] params = uri.split("/");
+        if (pattern.matcher(uri).matches() && parts.length == params.length) {
+            attributes = new HashMap<String, String>();
+            for (int i = 0; i < parts.length; i++) {
+                if (parts[i].startsWith(":")) {
+                    attributes.put(parts[i].replaceFirst(":", ""), params[i]);
+                }
+            }
+        }
+        return attributes;
+    }
+    
+    boolean isMatch(String controller, String action) {
+        return (controller == null || controller.equals(this.controller)) && (action == null || action.equals(this.action));
+    }
 
 }

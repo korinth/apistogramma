@@ -26,9 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Action {
-	
-	public String route();
+    
+    public String route();
 
-	public String method() default "";
+    public String method() default "";
 
 }

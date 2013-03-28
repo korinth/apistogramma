@@ -27,41 +27,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Controller {
-	
-	private Map<String, Method> actions = new HashMap<String, Method>();
-	
-	protected String name() {
-		return getClass().getSimpleName().toLowerCase();
-	}
+    
+    private Map<String, Method> actions = new HashMap<String, Method>();
+    
+    protected String name() {
+        return getClass().getSimpleName().toLowerCase();
+    }
 
-	protected void control(Environment environment) throws Status {
-		reflect(environment);
-	}
-	
-	protected final void reflect(Environment environment) throws Status {
-		try {
-			Method method = cache(environment.action);
-			method.invoke(this, environment);
-		} catch (NoSuchMethodException exception) {
-			throw new Status("No such action!", 404, exception);
-		} catch (InvocationTargetException exception) {
-			if (exception.getCause() instanceof Status) {
-				throw (Status) exception.getCause();
-			} else {
-				throw new Status("Unhandled exception!", 500, exception.getCause());
-			}			
-		} catch (Exception exception) {
-			throw new Status("Internal server error!", 500, exception);
-		}
-	}
-	
-	private Method cache(String action) throws SecurityException, NoSuchMethodException {
-		Method method = actions.get(action);
-		if (method == null) {
-			method = getClass().getMethod(action, Environment.class);
-			actions.put(action, method);
-		}
-		return method;
-	}
+    protected void control(Environment environment) throws Status {
+        reflect(environment);
+    }
+    
+    protected final void reflect(Environment environment) throws Status {
+        try {
+            Method method = cache(environment.action);
+            method.invoke(this, environment);
+        } catch (NoSuchMethodException exception) {
+            throw new Status("No such action!", 404, exception);
+        } catch (InvocationTargetException exception) {
+            if (exception.getCause() instanceof Status) {
+                throw (Status) exception.getCause();
+            } else {
+                throw new Status("Unhandled exception!", 500, exception.getCause());
+            }            
+        } catch (Exception exception) {
+            throw new Status("Internal server error!", 500, exception);
+        }
+    }
+    
+    private Method cache(String action) throws SecurityException, NoSuchMethodException {
+        Method method = actions.get(action);
+        if (method == null) {
+            method = getClass().getMethod(action, Environment.class);
+            actions.put(action, method);
+        }
+        return method;
+    }
 
 }
