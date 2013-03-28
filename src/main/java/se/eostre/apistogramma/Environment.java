@@ -33,6 +33,7 @@ public class Environment {
     String route;
     String controller;
     String action;
+    String context;
     HttpServletRequest request;
     HttpServletResponse response;
     Map<String, String> attributes;
@@ -41,6 +42,7 @@ public class Environment {
         this.request = request;
         this.response = response;
         uri = request.getServletPath().replace(".act", "");
+        context = request.getRequestURI().replace(request.getServletPath(), "");
         method = request.getMethod().toLowerCase();
     }
     
@@ -104,6 +106,14 @@ public class Environment {
         render(controller, action);
     }
     
+    public void json() throws Status {
+    	// TODO: implement JSON serialization of models
+    }
+    
+    public boolean isJsonRequest() {
+    	return false; // TODO: 
+    }
+    
     public void render(String controller, String action) throws Status {
         // TODO: if not AJAX
         try {
@@ -114,9 +124,8 @@ public class Environment {
     }
     
     public void redirect(String path) throws Status {
-        // TODO: if path.startsWith("/") add context path
         try {
-            response.sendRedirect(path);
+            response.sendRedirect(path.startsWith("/") ? context + path : path);
         } catch (Exception exception) {
             throw new Status("Unable to redirect!", 500, exception);
         }
@@ -124,7 +133,7 @@ public class Environment {
     
     @Override
     public String toString() {
-        return "{ uri => " + uri + ", method => " + method + ", attributes => " + attributes + "}";
+        return "{ context => '" + context + "', uri => '" + uri + "', method => '" + method + "' }";
     }
     
 }
