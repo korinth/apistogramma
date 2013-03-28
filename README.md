@@ -8,7 +8,7 @@ This project is work in progress. Suggestions are welcome!
 
 The following is an example of the intensions for usage of Apistogramma.
 
-##  com.example.controllers.Users.java
+###  com.example.controllers.Users.java
 
     package com.example.controllers;
     
@@ -35,7 +35,7 @@ The following is an example of the intensions for usage of Apistogramma.
             environment.render();
         }
         
-        @Action(route="/:controller/:id/:action")
+        @Action(route="/:controller/:id/:action", method="post")
         public void update(Environment environment) {
             User user = User.find(environment.getAttribute("id"));
             user.setStatus(environment.getParamter("user[status]"));
@@ -51,7 +51,7 @@ The following is an example of the intensions for usage of Apistogramma.
     }
 
 
-##  com.example.Dispatcher.java
+###  com.example.Dispatcher.java
 
     package com.example;
     
@@ -64,7 +64,7 @@ The following is an example of the intensions for usage of Apistogramma.
         }
     }
 
-## WEB-INF/web.xml
+### WEB-INF/web.xml
 
     <?xml version="1.0" encoding="UTF-8"?>
     <web-app version="2.5"
