@@ -38,7 +38,7 @@ The following is an example of the intensions for usage of Apistogramma.
         @Action(route="/:controller/:id/:action", method="post")
         public void update(Environment environment) {
             User user = User.find(environment.getAttribute("id"));
-            user.setStatus(environment.getParamter("user[status]"));
+            user.setStatus(environment.getParameter("user[status]"));
             user.save();
             environment.redirect("view");
         }
