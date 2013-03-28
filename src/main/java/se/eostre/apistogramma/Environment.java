@@ -40,7 +40,7 @@ public class Environment {
 	Environment(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
 		this.response = response;
-		uri = request.getPathInfo();
+		uri = request.getServletPath().replace(".act", "");
 		method = request.getMethod().toLowerCase();
 	}
 	
@@ -107,7 +107,7 @@ public class Environment {
 	public void render(String controller, String action) throws Status {
 		// TODO: if not AJAX
 		try {
-			request.getRequestDispatcher("/" + controller + "/" + action + ".jsp").forward(request, response);
+			request.getRequestDispatcher("/views/" + controller + "/" + action + ".jsp").forward(request, response);
 		} catch (Exception exception) {
 			throw new Status("Unable to render!", 500, exception);
 		}
@@ -124,7 +124,7 @@ public class Environment {
 	
 	@Override
 	public String toString() {
-		return "{ route =>" + route + ", uri =>" + uri + ", method =>" + method + ", attributes =>" + attributes + "}";
+		return "{ uri => " + uri + ", method => " + method + ", attributes => " + attributes + "}";
 	}
 	
 	
