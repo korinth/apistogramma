@@ -28,12 +28,12 @@ import javax.servlet.http.HttpServletResponse;
 
 public class Environment {
     
+	String context;
     String uri;
     String method;
     String route;
     String controller;
     String action;
-    String context;
     HttpServletRequest request;
     HttpServletResponse response;
     Map<String, String> attributes;
@@ -41,8 +41,8 @@ public class Environment {
     Environment(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
-        uri = request.getServletPath().replace(".act", "");
         context = request.getRequestURI().replace(request.getServletPath(), "");
+        uri = request.getServletPath().replace(".act", "");
         method = request.getMethod().toLowerCase();
     }
     
